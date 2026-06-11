@@ -261,6 +261,7 @@ Dokumentacja API portu WebKitu do GTK 4.
 %build
 CXXFLAGS="%{rpmcxxflags} -DNDEBUG %{?with_lowmem:--param ggc-min-expand=20 --param ggc-min-heapsize=65536}"
 for kind in %{?with_gtk3:gtk3} %{?with_gtk4:gtk4} ; do
+# USE_SYSTEM_MALLOC=ON (default in 32-bit builds) is broken as of v2.52.4 (bmalloc_CopyHeaders referred unconditionally in Source/JavaScriptCore/CMakeLists.txt)
 %cmake -B build-${kind} \
 	-DENABLE_GEOLOCATION=ON \
 	-DENABLE_GTKDOC=ON \
@@ -283,6 +284,7 @@ for kind in %{?with_gtk3:gtk3} %{?with_gtk4:gtk4} ; do
 	$([ "$kind" != "gtk4" ] && echo -DUSE_GTK4=OFF) \
 	-DUSE_LIBBACKTRACE=OFF \
 	%{!?with_sysprof:-DUSE_SYSPROF_CAPTURE=OFF} \
+	-DUSE_SYSTEM_MALLOC=OFF \
 	%{?max_bundle_size:-DUNIFIED_BUILD_MAX_BUNDLE_SIZE=%{max_bundle_size}}
 
 %{__make} -C build-${kind}
