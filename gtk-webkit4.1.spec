@@ -39,6 +39,7 @@ Patch1:		gtk-webkit4-icu59.patch
 Patch2:		parallel-gir.patch
 Patch3:		gtk-webkit4-driver-version-suffix.patch
 Patch4:		max-bundle-size.patch
+Patch5:		webkitgtk-serializers.patch
 URL:		https://webkitgtk.org/
 BuildRequires:	/usr/bin/ld.gold
 BuildRequires:	EGL-devel
@@ -252,11 +253,12 @@ Dokumentacja API portu WebKitu do GTK 4.
 
 %prep
 %setup -q -n webkitgtk-%{version}
-%patch -P 0 -p1
-%patch -P 1 -p1
-%patch -P 2 -p1
-%patch -P 3 -p1
-%patch -P 4 -p1
+%patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
+%patch -P3 -p1
+%patch -P4 -p1
+%patch -P5 -p1
 
 %build
 CXXFLAGS="%{rpmcxxflags} -DNDEBUG %{?with_lowmem:--param ggc-min-expand=20 --param ggc-min-heapsize=65536}"
