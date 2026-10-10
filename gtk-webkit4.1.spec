@@ -28,12 +28,12 @@ Summary:	Port of WebKit embeddable web component to GTK+ 3 with HTTP/2 support
 Summary(pl.UTF-8):	Port osadzalnego komponentu WWW WebKit do GTK+ 3 z obsługą HTTP/2
 Name:		gtk-webkit4.1
 # NOTE: 2.52.x is stable, 2.53.x devel
-Version:	2.52.4
-Release:	1
+Version:	2.52.6
+Release:	2
 License:	BSD-like
 Group:		X11/Libraries
 Source0:	https://webkitgtk.org/releases/webkitgtk-%{version}.tar.xz
-# Source0-md5:	9dca285545cf38c5d16218a290b3ca6a
+# Source0-md5:	b0a3fe77f93e174e6b30f099da1ae320
 Patch0:		x32.patch
 Patch1:		gtk-webkit4-icu59.patch
 Patch2:		parallel-gir.patch
