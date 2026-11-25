@@ -1,11 +1,12 @@
 # TODO: review configure options:
 # - FTL_JIT on !x86_64?
-# - WEB_RTC (experimental) + MEDIA_STREAM (BR: openwebrtc)
+# - WEB_RTC (default off for gtk port) + MEDIA_STREAM (BR: openwebrtc)?
 # - ENCRYPTED_MEDIA (experimental)
-# - THUNDER? (BR: Thunder + ThunderClientLibraries)
+# - THUNDER? (developer; BR: Thunder + ThunderClientLibraries)
 # - WEBDRIVER_BIDI (experimental)
 # - WEBXR (experimental; BR: OpenXR >= 1.0.20)
 # - WK_WEB_EXTENSIONS (experimental)
+# - USE_VULKAN (experimental; BR: vulkan-volk)
 #
 # Conditional build:
 %bcond_without	introspection	# GObject introspection
@@ -27,19 +28,17 @@
 Summary:	Port of WebKit embeddable web component to GTK+ 3 with HTTP/2 support
 Summary(pl.UTF-8):	Port osadzalnego komponentu WWW WebKit do GTK+ 3 z obsługą HTTP/2
 Name:		gtk-webkit4.1
-# NOTE: 2.52.x is stable, 2.53.x devel
-Version:	2.52.6
-Release:	2
+# NOTE: 2.54.x is stable, 2.55.x devel
+Version:	2.54.3
+Release:	1
 License:	BSD-like
 Group:		X11/Libraries
 Source0:	https://webkitgtk.org/releases/webkitgtk-%{version}.tar.xz
-# Source0-md5:	b0a3fe77f93e174e6b30f099da1ae320
+# Source0-md5:	e573b42fe1d53aa559b8d82bb8586892
 Patch0:		x32.patch
 Patch1:		gtk-webkit4-icu59.patch
 Patch2:		parallel-gir.patch
 Patch3:		gtk-webkit4-driver-version-suffix.patch
-Patch4:		max-bundle-size.patch
-Patch5:		webkitgtk-serializers.patch
 URL:		https://webkitgtk.org/
 BuildRequires:	/usr/bin/ld.gold
 BuildRequires:	EGL-devel
@@ -102,6 +101,7 @@ BuildRequires:	libtasn1-devel
 BuildRequires:	libwebp-devel
 BuildRequires:	libxml2-devel >= 1:2.9.13
 BuildRequires:	libxslt-devel >= 1.1.13
+BuildRequires:	ninja
 BuildRequires:	openjpeg2-devel >= 2.2.0
 BuildRequires:	openssl-devel >= 3.0.0
 BuildRequires:	pango-devel >= 1:1.32.0
@@ -136,25 +136,25 @@ BuildRequires:	xorg-lib-libXrender-devel
 BuildRequires:	xorg-lib-libXt-devel
 BuildRequires:	xz
 BuildRequires:	zlib-devel
-Requires:	at-spi2-core-libs >= 2.5.3
-Requires:	atk >= 1:2.16.0
-Requires:	cairo >= 1.16.0
-Requires:	fontconfig-libs >= 2.13.0
-Requires:	freetype >= 1:2.9.0
-Requires:	glib2 >= 1:2.70.0
-Requires:	gstreamer >= 1.2.3
-Requires:	gstreamer-plugins-base >= 1.2.3
-Requires:	gtk+3 >= 3.22.0
-Requires:	harfbuzz >= 2.7.4
-Requires:	libgcrypt >= 1.7.0
-Requires:	libjxl >= 0.7.0
-Requires:	libsoup3 >= 3.0
-Requires:	libxml2 >= 1:2.9.13
-Requires:	libxslt >= 1.1.13
-Requires:	openjpeg2 >= 2.2.0
-Requires:	pango >= 1:1.32.0
-Requires:	wayland >= 1.20
-Requires:	woff2 >= 1.0.2
+Requires:	at-spi2-core-libs%{?_isa} >= 2.5.3
+Requires:	atk%{?_isa} >= 1:2.16.0
+Requires:	cairo%{?_isa} >= 1.16.0
+Requires:	fontconfig-libs%{?_isa} >= 2.13.0
+Requires:	freetype%{?_isa} >= 1:2.9.0
+Requires:	glib2%{?_isa} >= 1:2.70.0
+Requires:	gstreamer%{?_isa} >= 1.2.3
+Requires:	gstreamer-plugins-base%{?_isa} >= 1.2.3
+Requires:	gtk+3%{?_isa} >= 3.22.0
+Requires:	harfbuzz%{?_isa} >= 2.7.4
+Requires:	libgcrypt%{?_isa} >= 1.7.0
+Requires:	libjxl%{?_isa} >= 0.7.0
+Requires:	libsoup3%{?_isa} >= 3.0
+Requires:	libxml2%{?_isa} >= 1:2.9.13
+Requires:	libxslt%{?_isa} >= 1.1.13
+Requires:	openjpeg2%{?_isa} >= 2.2.0
+Requires:	pango%{?_isa} >= 1:1.32.0
+Requires:	wayland%{?_isa} >= 1.20
+Requires:	woff2%{?_isa} >= 1.0.2
 %{?with_introspection:Conflicts:	gir-repository < 0.6.5-7}
 # Source/JavaScriptCore/CMakeLists.txt /WTF_CPU_
 ExclusiveArch:	%{ix86} %{x8664} x32 %{arm} aarch64 hppa mips ppc ppc64 ppc64le s390 s390x sh4
@@ -172,11 +172,11 @@ obsługą HTTP/2 (libsoup 3).
 Summary:	Development files for WebKit for GTK+ 3 with HTTP/2 support
 Summary(pl.UTF-8):	Pliki programistyczne komponentu WebKit dla GTK+ 3 z obsługą HTTP/2
 Group:		X11/Development/Libraries
-Requires:	gtk-webkit4.1 = %{version}-%{release}
-Requires:	glib2-devel >= 1:2.70.0
-Requires:	gtk+3-devel >= 3.22.0
-Requires:	libsoup3-devel >= 3.0
-Requires:	libstdc++-devel >= 6:11.2
+Requires:	%{name}%{?_isa} = %{version}-%{release}
+Requires:	glib2-devel%{?_isa} >= 1:2.70.0
+Requires:	gtk+3-devel%{?_isa} >= 3.22.0
+Requires:	libsoup3-devel%{?_isa} >= 3.0
+Requires:	libstdc++-devel%{?_isa} >= 6:12.2
 
 %description devel
 Development files for WebKit for GTK+ 3 with HTTP/2 support.
@@ -200,25 +200,25 @@ Dokumentacja API portu WebKitu do GTK+ 3 z obsługą HTTP/2.
 Summary:	Port of WebKit embeddable web component to GTK 4
 Summary(pl.UTF-8):	Port osadzalnego komponentu WWW WebKit do GTK 4
 Group:		X11/Libraries
-Requires:	at-spi2-core-libs >= 2.5.3
-Requires:	atk >= 1:2.16.0
-Requires:	cairo >= 1.16.0
-Requires:	fontconfig-libs >= 2.13.0
-Requires:	freetype >= 1:2.9.0
-Requires:	glib2 >= 1:2.70.0
-Requires:	gstreamer >= 1.2.3
-Requires:	gstreamer-plugins-base >= 1.2.3
-Requires:	gtk4 >= 4.6.0
-Requires:	harfbuzz >= 2.7.4
-Requires:	libgcrypt >= 1.7.0
-Requires:	libjxl >= 0.7.0
-Requires:	libsoup3 >= 3.0
-Requires:	libxml2 >= 1:2.9.13
-Requires:	libxslt >= 1.1.13
-Requires:	openjpeg2 >= 2.2.0
-Requires:	pango >= 1:1.32.0
-Requires:	wayland >= 1.20
-Requires:	woff2 >= 1.0.2
+Requires:	at-spi2-core-libs%{?_isa} >= 2.5.3
+Requires:	atk%{?_isa} >= 1:2.16.0
+Requires:	cairo%{?_isa} >= 1.16.0
+Requires:	fontconfig-libs%{?_isa} >= 2.13.0
+Requires:	freetype%{?_isa} >= 1:2.9.0
+Requires:	glib2%{?_isa} >= 1:2.70.0
+Requires:	gstreamer%{?_isa} >= 1.2.3
+Requires:	gstreamer-plugins-base%{?_isa} >= 1.2.3
+Requires:	gtk4%{?_isa} >= 4.6.0
+Requires:	harfbuzz%{?_isa} >= 2.7.4
+Requires:	libgcrypt%{?_isa} >= 1.7.0
+Requires:	libjxl%{?_isa} >= 0.7.0
+Requires:	libsoup3%{?_isa} >= 3.0
+Requires:	libxml2%{?_isa} >= 1:2.9.13
+Requires:	libxslt%{?_isa} >= 1.1.13
+Requires:	openjpeg2%{?_isa} >= 2.2.0
+Requires:	pango%{?_isa} >= 1:1.32.0
+Requires:	wayland%{?_isa} >= 1.20
+Requires:	woff2%{?_isa} >= 1.0.2
 
 %description -n gtk-webkit6
 gtk-webkit6 is a port of the WebKit embeddable web component to GTK 4.
@@ -230,11 +230,11 @@ gtk-webkit6 to port osadzalnego komponentu WWW WebKit do GTK+ 4.
 Summary:	Development files for WebKit for GTK 4
 Summary(pl.UTF-8):	Pliki programistyczne komponentu WebKit dla GTK 4
 Group:		X11/Development/Libraries
-Requires:	gtk-webkit6 = %{version}-%{release}
-Requires:	glib2-devel >= 1:2.70.0
-Requires:	gtk4-devel >= 4.6.0
-Requires:	libsoup3-devel >= 3.0
-Requires:	libstdc++-devel >= 6:11.2
+Requires:	gtk-webkit6%{?_isa} = %{version}-%{release}
+Requires:	glib2-devel%{?_isa} >= 1:2.70.0
+Requires:	gtk4-devel%{?_isa} >= 4.6.0
+Requires:	libsoup3-devel%{?_isa} >= 3.0
+Requires:	libstdc++-devel%{?_isa} >= 6:12.2
 
 %description -n gtk-webkit6-devel
 Development files for WebKit for GTK 4.
@@ -260,14 +260,12 @@ Dokumentacja API portu WebKitu do GTK 4.
 %patch -P1 -p1
 %patch -P2 -p1
 %patch -P3 -p1
-%patch -P4 -p1
-%patch -P5 -p1
 
 %build
 CXXFLAGS="%{rpmcxxflags} -DNDEBUG %{?with_lowmem:--param ggc-min-expand=20 --param ggc-min-heapsize=65536}"
 for kind in %{?with_gtk3:gtk3} %{?with_gtk4:gtk4} ; do
 # USE_SYSTEM_MALLOC=ON (default in 32-bit builds) is broken as of v2.52.4 (bmalloc_CopyHeaders referred unconditionally in Source/JavaScriptCore/CMakeLists.txt)
-%cmake -B build-${kind} \
+%cmake -B build-${kind} -GNinja \
 	-DENABLE_GEOLOCATION=ON \
 	-DENABLE_GTKDOC=ON \
 	%{!?with_introspection:-DENABLE_INTROSPECTION=OFF} \
@@ -281,26 +279,22 @@ for kind in %{?with_gtk3:gtk3} %{?with_gtk4:gtk4} ; do
 	-DENABLE_JIT=OFF \
 	-DENABLE_SAMPLING_PROFILER=OFF \
 %endif
-%ifarch %{ix86} %{x8664} x32
-	-DHAVE_SSE2_EXTENSIONS=ON \
-%endif
 	-DPORT=GTK \
 	-DSHOULD_INSTALL_JS_SHELL=ON \
 	$([ "$kind" != "gtk4" ] && echo -DUSE_GTK4=OFF) \
 	-DUSE_LIBBACKTRACE=OFF \
 	%{!?with_sysprof:-DUSE_SYSPROF_CAPTURE=OFF} \
 	-DUSE_SYSTEM_MALLOC=OFF \
-	%{?max_bundle_size:-DUNIFIED_BUILD_MAX_BUNDLE_SIZE=%{max_bundle_size}}
+	%{?max_bundle_size:-DWEBKIT_MAX_BUNDLE_SIZE=%{max_bundle_size}}
 
-%{__make} -C build-${kind}
+%ninja_build -C build-${kind}
 done
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 for kind in %{?with_gtk3:gtk3} %{?with_gtk4:gtk4} ; do
-%{__make} -C build-${kind} install \
-	DESTDIR=$RPM_BUILD_ROOT
+%ninja_install -C build-${kind}
 done
 
 install -d $RPM_BUILD_ROOT%{_gidocdir}
