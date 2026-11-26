@@ -39,6 +39,7 @@ Patch0:		x32.patch
 Patch1:		gtk-webkit4-icu59.patch
 Patch2:		parallel-gir.patch
 Patch3:		gtk-webkit4-driver-version-suffix.patch
+Patch4:		webkitgtk-32bit.patch
 URL:		https://webkitgtk.org/
 BuildRequires:	/usr/bin/ld.gold
 BuildRequires:	EGL-devel
@@ -155,6 +156,10 @@ Requires:	openjpeg2%{?_isa} >= 2.2.0
 Requires:	pango%{?_isa} >= 1:1.32.0
 Requires:	wayland%{?_isa} >= 1.20
 Requires:	woff2%{?_isa} >= 1.0.2
+%ifarch %{ix86}
+# requires SSE2 fp math
+Requires:	cpuinfo(sse2)
+%endif
 %{?with_introspection:Conflicts:	gir-repository < 0.6.5-7}
 # Source/JavaScriptCore/CMakeLists.txt /WTF_CPU_
 ExclusiveArch:	%{ix86} %{x8664} x32 %{arm} aarch64 hppa mips ppc ppc64 ppc64le s390 s390x sh4
@@ -219,6 +224,10 @@ Requires:	openjpeg2%{?_isa} >= 2.2.0
 Requires:	pango%{?_isa} >= 1:1.32.0
 Requires:	wayland%{?_isa} >= 1.20
 Requires:	woff2%{?_isa} >= 1.0.2
+%ifarch %{ix86}
+# requires SSE2 fp math
+Requires:	cpuinfo(sse2)
+%endif
 
 %description -n gtk-webkit6
 gtk-webkit6 is a port of the WebKit embeddable web component to GTK 4.
@@ -260,6 +269,7 @@ Dokumentacja API portu WebKitu do GTK 4.
 %patch -P1 -p1
 %patch -P2 -p1
 %patch -P3 -p1
+%patch -P4 -p1
 
 %build
 CXXFLAGS="%{rpmcxxflags} -DNDEBUG %{?with_lowmem:--param ggc-min-expand=20 --param ggc-min-heapsize=65536}"
@@ -284,7 +294,11 @@ for kind in %{?with_gtk3:gtk3} %{?with_gtk4:gtk4} ; do
 	$([ "$kind" != "gtk4" ] && echo -DUSE_GTK4=OFF) \
 	-DUSE_LIBBACKTRACE=OFF \
 	%{!?with_sysprof:-DUSE_SYSPROF_CAPTURE=OFF} \
+%ifarch %{x8664} aarch64 ppc64 ppc64le s390x
 	-DUSE_SYSTEM_MALLOC=OFF \
+%else
+	-DUSE_SYSTEM_MALLOC=ON \
+%endif
 	%{?max_bundle_size:-DWEBKIT_MAX_BUNDLE_SIZE=%{max_bundle_size}}
 
 %ninja_build -C build-${kind}
