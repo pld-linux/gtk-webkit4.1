@@ -114,7 +114,8 @@ BuildRequires:	rpmbuild(macros) >= 2.029
 BuildRequires:	ruby >= 1:2.5
 BuildRequires:	ruby-modules >= 1:2.5
 %if "%{ruby_version}" >= "3.0"
-BuildRequires:	ruby-getoptlong
+# ruby-getoptlong or ruby-bundled-gems
+BuildRequires:	rubygem(getoptlong)
 %endif
 BuildRequires:	sqlite3-devel >= 3
 %{?with_sysprof:BuildRequires:	sysprof-devel >= 3.38}
